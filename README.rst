@@ -24,7 +24,8 @@ Add something similar to this in /etc/ironic/ironic.conf:
 enabled_drivers=agent_hds,...
 
 [hds]
-root_url=http://192.168.122.1:8080/redfish/v1/
+
+root_url=https://192.168.122.1:8080/redfish/v1/
 
 username=admin
 
@@ -44,6 +45,9 @@ in the [ironic.drivers] section
 Enroll some nodes managed by this driver:
 
 $ ironic node-create -d agent_hds -n hds-1 -u 4c4c4544-0053-5610-8053-b2c04f563432
+
+Currently Ironic's node uuid is used as a Redfish ComputerSystem ID. This is perhaps
+not proper Redfish but plays with HDS and no extra configuration is needed.
 
 Test
 ====

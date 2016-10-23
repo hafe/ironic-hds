@@ -37,10 +37,10 @@ RESET_TYPE_TO_POWER_STATE = {
 
 class HDSClient(object):
     """HDS client that handles the REST API
-    Is unaware of the CEE API and configuration and just manages the REST API
     """
     def __init__(self, api_url, username, password, cert_verify=True):
-        self._api_url = api_url
+        self._api_url = api_url \
+            if api_url[len(api_url) - 1] == "/" else api_url + "/"
         self._session = requests.session()
         self._session.headers["Content-Type"] = "application/json"
         self._session.auth = (username, password)

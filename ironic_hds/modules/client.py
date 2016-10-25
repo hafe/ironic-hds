@@ -122,31 +122,3 @@ class HDSClient(object):
         '''
         boot_source = _system_boot_source.get(sys_id, "Disk")
         _system_boot_source.update({sys_id: boot_source})
-
-
-def get_client(api_url, username, password, cert_verify):
-    """Returns an initialized client """
-    return HDSClient(api_url, username, password, cert_verify)
-
-def main():
-    """test - WARNING, do not run unless you really mean to"""
-
-    c = get_client(os.getenv("HDS_API_URL"),
-                   os.getenv("HDS_USERNAME"),
-                   os.getenv("HDS_PASSWORD"),
-                   False)
-
-    assert len(sys.argv) == 3
-    sys_id = sys.argv[1]
-    cmd = sys.argv[2]
-    if cmd == "poweron":
-        c.compute_reset(sys_id, "On")
-    elif cmd == "poweroff":
-        c.compute_reset(sys_id, "ForceOff")
-    elif cmd == "set-pxe-boot":
-        c.system_set_boot_source(sys_id, "Pxe")
-
-    sys.exit(1)
-
-if __name__ == "__main__":
-    main()

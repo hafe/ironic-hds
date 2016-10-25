@@ -18,7 +18,7 @@ Common functionality shared between different modules.
 from oslo_config import cfg
 from oslo_log import log as logging
 from ironic.common.i18n import _
-from ironic_hds.modules import client
+from ironic_hds.modules.client import HDSClient
 
 COMMON_PROPERTIES = {}
 
@@ -67,7 +67,7 @@ def get_client():
     :raises: InvalidParameterValue if mandatory information is missing on the
              node or on invalid input.
     """
-    return client.get_client(CONF.hds.root_url,
-                             CONF.hds.username,
-                             CONF.hds.password,
-                             CONF.hds.cert_verify)
+    return HDSClient(CONF.hds.root_url,
+                                CONF.hds.username,
+                                CONF.hds.password,
+                                CONF.hds.cert_verify)

@@ -22,7 +22,7 @@ from ironic.common.i18n import _LE
 from ironic.common import states
 from ironic.conductor import task_manager
 from ironic.drivers import base
-from ironic.drivers.modules.hds import common
+from ironic_hds.modules import common
 
 LOG = logging.getLogger(__name__)
 

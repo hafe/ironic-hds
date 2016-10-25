@@ -19,12 +19,12 @@ from oslo_utils import importutils
 from ironic.common import exception
 from ironic.common.i18n import _
 from ironic.drivers import base
-from ironic.drivers.modules import agent
-from ironic.drivers.modules.hds import common
-from ironic.drivers.modules.hds import management as hds_mgmt
-from ironic.drivers.modules.hds import power as hds_power
-from ironic.drivers.modules import pxe
-from ironic.drivers.modules import inspector
+from ironic.modules import agent
+from ironic_hds.modules import common
+from ironic_hds.modules import management as hds_mgmt
+from ironic_hds.modules import power as hds_power
+from ironic.modules import pxe
+from ironic.modules import inspector
 
 
 class AgentHDSDriver(base.BaseDriver):

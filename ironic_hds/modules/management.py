@@ -24,7 +24,7 @@ from ironic.common import exception
 from ironic.common.i18n import _, _LE, _LI
 from ironic.conductor import task_manager
 from ironic.drivers import base
-from ironic.drivers.modules.hds import common
+from ironic_hds.modules import common
 
 LOG = logging.getLogger(__name__)
 

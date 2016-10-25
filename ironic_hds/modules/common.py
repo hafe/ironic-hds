@@ -18,7 +18,7 @@ Common functionality shared between different modules.
 from oslo_config import cfg
 from oslo_log import log as logging
 from ironic.common.i18n import _
-import hds
+from ironic_hds.modules import client
 
 COMMON_PROPERTIES = {}
 
@@ -60,14 +60,14 @@ def parse_driver_info(node):
 
 
 def get_client():
-    """Returns a new Refish client object.
+    """Returns a new Redfish client object.
 
     :param node: an ironic node object.
     :returns: a hdsConnection object.
     :raises: InvalidParameterValue if mandatory information is missing on the
              node or on invalid input.
     """
-    return hds.get_client(CONF.hds.root_url,
-                          CONF.hds.username,
-                          CONF.hds.password,
-                          CONF.hds.cert_verify)
+    return client.get_client(CONF.hds.root_url,
+                             CONF.hds.username,
+                             CONF.hds.password,
+                             CONF.hds.cert_verify)

@@ -7,13 +7,13 @@ Build
 =====
 
 Create a package (egg, rpm, ...) for example:
-$ python setup.py bdist_rpm
+$ python setup.py bdist_egg
 
 Installation
 ============
 
 Install the package for example:
-$ sudo rpm -i hds-ironic-0.0.1.dev6-1.noarch.rpm
+$ sudo easy_install ironic_hds-0.0.1.dev7-py2.7.egg
 
 Configuration
 =============

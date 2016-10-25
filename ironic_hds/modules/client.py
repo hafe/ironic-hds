@@ -7,9 +7,7 @@ https://www.dmtf.org/standards/redfish
 """
 
 import json
-import os
 import requests
-import sys
 import time
 
 try:

@@ -68,6 +68,6 @@ def get_client():
              node or on invalid input.
     """
     return HDSClient(CONF.hds.root_url,
-                                CONF.hds.username,
-                                CONF.hds.password,
-                                CONF.hds.cert_verify)
+                     CONF.hds.username,
+                     CONF.hds.password,
+                     CONF.hds.cert_verify)

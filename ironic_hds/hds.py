@@ -14,17 +14,14 @@
 """
 Redfish Driver
 """
-from oslo_utils import importutils
 
-from ironic.common import exception
-from ironic.common.i18n import _
 from ironic.drivers import base
-from ironic.modules import agent
+from ironic.drivers.modules import agent
+from ironic.drivers.modules import inspector
+from ironic.drivers.modules import pxe
 from ironic_hds.modules import common
 from ironic_hds.modules import management as hds_mgmt
 from ironic_hds.modules import power as hds_power
-from ironic.modules import pxe
-from ironic.modules import inspector
 
 
 class AgentHDSDriver(base.BaseDriver):
@@ -44,7 +41,7 @@ class AgentHDSDriver(base.BaseDriver):
         self.management = hds_mgmt.Management()
         self.power = hds_power.Power()
         self.vendor = agent.AgentVendorInterface()
-        self.inspect = inspector.Inspector.create_if_enabled('AgentHDSDriver')
+        #self.inspect = inspector.Inspector.create_if_enabled('AgentHDSDriver')
 
         # get a client just check global driver configuration
         common.get_client()

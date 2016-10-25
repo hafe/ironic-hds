@@ -3,18 +3,17 @@ ironic-hds
 This repository contains a temporary OpenStack Ironic driver for testing with Redfish based system.
 One example is the Ericsson HDS system.
 
+Build
+=====
+
+Create a package (egg, rpm, ...) for example:
+$ python setup.py bdist_rpm
+
 Installation
 ============
 
-Create a tar of the drivers directory:
-$ tar cvfz ~/aball.tgz drivers
-
-Transfer tar ball to system where Ironic is installed.
-Untar the ball standing in the proper directory:
-
-$ cd /usr/lib/python2.7/site-packages/ironic
-
-$ tar xvfz ~/aball.tgz
+Install the package for example:
+$ sudo rpm -i hds-ironic-0.0.1.dev6-1.noarch.rpm
 
 Configuration
 =============
@@ -31,16 +30,6 @@ username=admin
 
 password=qwerty
 
-
-And a bit hackish, edit the original python egg's entrypoints:
-
-$ sudo vi /usr/lib/python2.7/site-packages/ironic-5.1.2-py2.7.egg-info/entry_points.txt
-
-And add:
-
-agent_hds = ironic.drivers.hds:AgentHDSDriver
-
-in the [ironic.drivers] section
 
 Enroll some nodes managed by this driver:
 

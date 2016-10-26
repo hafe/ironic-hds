@@ -7,12 +7,14 @@ Build
 =====
 
 Create a package (egg, rpm, ...) for example:
+
 $ python setup.py bdist_egg
 
 Installation
 ============
 
 Install the package for example:
+
 $ sudo easy_install ironic_hds-0.0.1.dev7-py2.7.egg
 
 Configuration
@@ -34,14 +36,15 @@ password=qwerty
 Enroll some nodes managed by this driver:
 
 $ ironic node-create -d agent_hds -n hds-1 -u 4c4c4544-0053-5610-8053-b2c04f563432
+$ ironic port-create -n 4c4c4544-0053-5610-8053-b2c04f563432 -a ec:f4:bb:e0:d5:dc
 
 Currently Ironic's node uuid is used as a Redfish ComputerSystem ID. This is perhaps
-not proper Redfish but plays with HDS and no extra configuration is needed.
+not proper Redfish but plays well with HDS and no extra configuration is needed.
 
 Test
 ====
 
-So far just tested with a redfish simulator as backend and using ironic commands:
+Tested with a HDS backend (Redfish manager) and using ironic commands:
 
 $ ironic node-power-state-set hds-1 off
 

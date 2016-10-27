@@ -26,8 +26,9 @@ from ironic_hds.modules import common
 
 LOG = logging.getLogger(__name__)
 
+# "ForceRestart" seems to work better then "On", at least with Dell servers
 REDFISH_TO_IRONIC_RESET_TYPES = {
-    'On': states.POWER_ON,
+    'ForceRestart': states.POWER_ON,
     'ForceOff': states.POWER_OFF,
     'ForceRestart': states.REBOOT,
 }

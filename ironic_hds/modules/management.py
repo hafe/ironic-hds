@@ -20,8 +20,6 @@ HDS management interface
 from oslo_log import log as logging
 
 from ironic.common import boot_devices
-from ironic.common import exception
-from ironic.common.i18n import _, _LE, _LI
 from ironic.conductor import task_manager
 from ironic.drivers import base
 from ironic_hds.modules import common
@@ -84,7 +82,6 @@ class Management(base.ManagementInterface):
             :persistent: whether the boot device will persist to all future
                 boots or not, None if it is unknown.
         """
-        LOG.info('get_boot_device', task.node.uuid)
         client = common.get_client()
         return client.system_get_boot_source(task.node.uuid)
 
@@ -102,7 +99,8 @@ class Management(base.ManagementInterface):
                            Default: False.
         :raises: InvalidParameterValue if an invalid boot device is specified.
         """
-        LOG.info('set_boot_device', task.node.uuid, device, persistent)
+        LOG.info("set_boot_device node:%s device:'%s' persistent:%s" %
+                 (task.node.uuid, device, persistent))
         client = common.get_client()
         client.system_set_boot_source(task.node.uuid,
                                       IRONIC_TO_REDFISH_BOOT_DEVICE[device],

@@ -54,8 +54,6 @@ def parse_driver_info(node):
              is missing on the node or on invalid inputs.
     """
 
-    LOG.info('parse_driver_info')
-
     return {}
 
 

@@ -8,6 +8,7 @@ https://www.dmtf.org/standards/redfish
 
 import json
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import time
 
 try:
@@ -47,6 +48,8 @@ class HDSClient(object):
         self._session.verify = cert_verify
         self._status_forcelist = [500, 502, 503, 504]
         self._total_retries = 5
+        if not cert_verify:
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
     def _get(self, path):
         _logger.debug("GET " + path)

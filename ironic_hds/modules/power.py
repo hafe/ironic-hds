@@ -17,7 +17,6 @@ HDS power interface
 
 from oslo_log import log as logging
 
-from ironic.common import exception
 from ironic.common.i18n import _LE
 from ironic.common import states
 from ironic.conductor import task_manager
@@ -63,8 +62,6 @@ class Power(base.PowerInterface):
         :raises: RedfishOperationError on an error from redfish.
         """
 
-        LOG.info('get_power_state node %s' % task.node.uuid)
-
         node = task.node
         client = common.get_client()
 
@@ -88,8 +85,7 @@ class Power(base.PowerInterface):
         :raises: RedfishOperationError on an error from redfish.
         """
 
-        LOG.info('set_power_state node %s state "%s"' %
-                 (task.node.uuid, power_state))
+        LOG.info("set_power_state node:%s, state:'%s'" % (task.node.uuid, power_state))
 
         node = task.node
         client = common.get_client()
@@ -122,6 +118,4 @@ class Power(base.PowerInterface):
         :raises: InvalidParameterValue if required credentials are missing.
         :raises: RedfishOperationError on an error from redfish.
         """
-        LOG.info('reboot node %s' % task.node.uuid)
-
         self.set_power_state(task, states.REBOOT)

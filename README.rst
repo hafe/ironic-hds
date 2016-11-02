@@ -1,6 +1,6 @@
 ironic-hds
 ==========
-This repository contains a temporary OpenStack Ironic driver for testing with Redfish based system.
+This repository contains an OpenStack Ironic driver for testing with Redfish based system.
 One example is the Ericsson HDS system.
 
 Build
@@ -32,6 +32,7 @@ username=admin
 
 password=qwerty
 
+#cert_verify=false
 
 Enroll some nodes managed by this driver:
 

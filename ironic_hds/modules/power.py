@@ -26,25 +26,12 @@ from ironic_hds.modules import common
 
 LOG = logging.getLogger(__name__)
 
-# "ForceRestart" seems to work better then "On", at least with Dell servers
-REDFISH_TO_IRONIC_RESET_TYPES = {
-    'ForceRestart': states.POWER_ON,
-    'ForceOff': states.POWER_OFF,
-    'ForceRestart': states.REBOOT,
-}
-
-IRONIC_TO_REDFISH_RESET_TYPES = \
-    dict((v, k) for (k, v) in REDFISH_TO_IRONIC_RESET_TYPES.items())
-
 REDFISH_TO_IRONIC_POWER_STATES = {
     'On': states.POWER_ON,
     'Off': states.POWER_OFF,
     'PoweringOn': states.POWER_ON,
     'PoweringOff': states.POWER_ON,
 }
-
-IRONIC_TO_REDFISH_POWER_STATES = \
-    dict((v, k) for (k, v) in REDFISH_TO_IRONIC_POWER_STATES.items())
 
 
 class Power(base.PowerInterface):
@@ -106,7 +93,15 @@ class Power(base.PowerInterface):
 
         node = task.node
         client = common.get_client()
-        reset_type = IRONIC_TO_REDFISH_RESET_TYPES[power_state]
+        if power_state == states.POWER_ON:
+            # "ForceRestart" seems to work better then "On"
+            reset_type = 'ForceRestart'
+        elif power_state == states.POWER_OFF:
+            reset_type = 'ForceOff'
+        elif power_state == states.REBOOT:
+            reset_type = 'ForceRestart'
+        else:
+            raise ValueError(power_state)
 
         try:
             client.system_reset(node.uuid, reset_type)

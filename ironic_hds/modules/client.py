@@ -21,7 +21,7 @@ _logger = logging.getLogger(__name__)
 A cache of the power state for each system. This is because current missing
 support in the redfish manager. This will be fixed in short.
 Assume systems are powered ON when we start (should be safer) since the
-Ironic e.g. will start by powering them on and we for sure get to a known state.
+Ironic e.g. will start by powering them on and we get to a known state.
 
 Same for boot source, set it to disk and Ironic will change to PXE
 """
@@ -31,7 +31,9 @@ _system_boot_source = {}
 RESET_TYPE_TO_POWER_STATE = {
     'On': 'On',
     'ForceOff': 'Off',
+    'ForceRestart': 'On'
 }
+
 
 class HDSClient(object):
     """HDS client that handles the REST API

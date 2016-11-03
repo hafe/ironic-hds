@@ -22,7 +22,7 @@ Configuration
 
 Add something similar to this in /etc/ironic/ironic.conf:
 
-enabled_drivers=agent_hds,...
+enabled_drivers=pxe_hds,...
 
 [hds]
 

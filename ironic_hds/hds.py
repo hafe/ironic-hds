@@ -17,14 +17,14 @@ Redfish Driver
 
 from ironic.drivers import base
 from ironic.drivers.modules import agent
-from ironic.drivers.modules import inspector
+from ironic.drivers.modules import iscsi_deploy
 from ironic.drivers.modules import pxe
 from ironic_hds.modules import common
 from ironic_hds.modules import management as hds_mgmt
 from ironic_hds.modules import power as hds_power
 
 
-class AgentHDSDriver(base.BaseDriver):
+class AgentAndHDSDriver(base.BaseDriver):
     """Agent + hds driver.
 
     This driver implements the `core` functionality, combining
@@ -46,4 +46,17 @@ class AgentHDSDriver(base.BaseDriver):
         # get a client just check global driver configuration
         common.get_client()
 
-        # TODO use it to get root or something
+
+class PXEAndHDSDriver(base.BaseDriver):
+    """PXE + ISCSI + hds driver.
+    """
+
+    def __init__(self):
+        self.boot = pxe.PXEBoot()
+        self.deploy = iscsi_deploy.ISCSIDeploy()
+        self.management = hds_mgmt.Management()
+        self.power = hds_power.Power()
+        self.vendor = iscsi_deploy.VendorPassthru()
+
+        # get a client just check global driver configuration
+        common.get_client()

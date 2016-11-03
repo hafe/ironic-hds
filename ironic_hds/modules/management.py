@@ -27,7 +27,7 @@ from ironic_hds.modules import common
 LOG = logging.getLogger(__name__)
 
 IRONIC_TO_REDFISH_BOOT_DEVICE = {
-    boot_devices.DISK: 'HardDisk',
+    boot_devices.DISK: 'Hdd',
     boot_devices.PXE: 'Pxe',
     boot_devices.CDROM: 'Cd',
 }

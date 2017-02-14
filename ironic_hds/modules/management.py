@@ -65,7 +65,6 @@ class Management(base.ManagementInterface):
                   in :mod:`ironic.common.boot_devices`.
 
         """
-        LOG.info('get_supported_boot_devices')
         return list(IRONIC_TO_REDFISH_BOOT_DEVICE.keys())
 
     def get_boot_device(self, task):

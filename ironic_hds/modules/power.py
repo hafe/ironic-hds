@@ -97,7 +97,7 @@ class Power(base.PowerInterface):
         elif power_state == states.REBOOT:
             reset_type = 'ForceRestart'
         else:
-            raise ValueError(power_state)
+            raise ValueError("Unsupported power_state '%s'" % power_state)
 
         try:
             client.system_reset(node.uuid, reset_type)

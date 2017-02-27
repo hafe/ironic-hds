@@ -42,9 +42,6 @@ class AgentAndHDSDriver(base.BaseDriver):
         self.power = hds_power.Power()
         #self.inspect = inspector.Inspector.create_if_enabled('AgentHDSDriver')
 
-        # get a client just check global driver configuration
-        common.get_client()
-
 
 class PXEAndHDSDriver(base.BaseDriver):
     """PXE + ISCSI + hds driver.
@@ -55,6 +52,3 @@ class PXEAndHDSDriver(base.BaseDriver):
         self.deploy = iscsi_deploy.ISCSIDeploy()
         self.management = hds_mgmt.Management()
         self.power = hds_power.Power()
-
-        # get a client just check global driver configuration
-        common.get_client()

@@ -18,7 +18,7 @@ Common functionality shared between different modules.
 from oslo_config import cfg
 from oslo_log import log as logging
 from ironic.common.i18n import _
-from ironic_hds.modules.client import HDSClient
+from ironic.drivers.modules import deploy_utils
 
 COMMON_PROPERTIES = {}
 
@@ -37,8 +37,19 @@ opts = [
                 help=_('Option to skip Redfish certificate verification')),
 ]
 
-CONF = cfg.CONF
-CONF.register_opts(opts, group='hds')
+REQUIRED_PROPERTIES = {
+    'redfish_address': _('Redfish Manager hostname/IP-address. Required.'),
+    'redfish_username': _('Redfish Manager admin/server-profile username. Required.'),
+    'redfish_password': _('Redfish Manager password. Required.'),
+}
+
+OPTIONAL_PROPERTIES = {
+    'cert_verify': _("Skip server certificate validation. Optional."),
+}
+
+COMMON_PROPERTIES = {}
+COMMON_PROPERTIES.update(REQUIRED_PROPERTIES)
+COMMON_PROPERTIES.update(OPTIONAL_PROPERTIES)
 
 
 def parse_driver_info(node):
@@ -54,18 +65,11 @@ def parse_driver_info(node):
              is missing on the node or on invalid inputs.
     """
 
-    return {}
-
-
-def get_client():
-    """Returns a new Redfish client object.
-
-    :param node: an ironic node object.
-    :returns: a hdsConnection object.
-    :raises: InvalidParameterValue if mandatory information is missing on the
-             node or on invalid input.
-    """
-    return HDSClient(CONF.hds.root_url,
-                     CONF.hds.username,
-                     CONF.hds.password,
-                     CONF.hds.cert_verify)
+    info = {}
+    for param in REQUIRED_PROPERTIES:
+        info[param] = node.driver_info.get(param)
+    error_msg = (_("%s driver requires these parameters to be set in the "
+                   "node's driver_info.") %
+                 node.driver)
+    deploy_utils.check_for_missing_params(info, error_msg)
+    return info

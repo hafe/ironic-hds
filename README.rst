@@ -23,28 +23,41 @@ Install the package for example::
 Configuration
 =============
 
-Add something similar to this in /etc/ironic/ironic.conf:
+Common
+++++++
 
-enabled_drivers=pxe_hds,...
+Add *agent_hds* and/or *pxe_hds* to the list of *enabled_drivers* in
+*/etc/ironic/ironic.conf* for example::
 
-[hds]
+    enabled_drivers = pxe_ipmitool,pxe_hds,agent_hds
 
-root_url=https://192.168.122.1:8080/redfish/v1/
+Restart the Ironic conductor service::
 
-username=admin
+    service ironic-conductor restart
 
-password=qwerty
 
-#cert_verify=false
+Node specific
++++++++++++++
 
 Enroll some nodes managed by this driver::
 
-    $ ironic node-create -d agent_hds -n hds-1 -u 4c4c4544-0053-5610-8053-b2c04f563432
+    $ ironic node-create -d agent_hds -n hds-1 -u 4c4c4544-0053-5610-8053-b2c04f563432 \
+        -i redfish_address=https://192.168.122.1:8080/redfish/v1/4c4c4544-0053-5610-8053-b2c04f563432 \
+        -i redfish_username=admin \
+        -i redfish_password=qwerty
+
+Optionally allow insecure TLS connections, configure to skip certificate verification::
+
+        -i cert_verify=false
+
+
+Associate port with node created::
+
     $ ironic port-create -n 4c4c4544-0053-5610-8053-b2c04f563432 -a ec:f4:bb:e0:d5:dc
 
-Currently Ironic's node uuid is used as a Redfish ComputerSystem ID. This is
-perhaps not proper Redfish but plays well with HDS and no extra configuration
-is needed.
+In the example the Redfish ComputerSystem ID is used as Ironic's node uuid.
+This is not required but enables simple correlation of Ironic nodes and Redfish
+ComputerSystems.
 
 Test
 ====

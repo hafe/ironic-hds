@@ -23,6 +23,7 @@ from ironic.common import boot_devices
 from ironic.conductor import task_manager
 from ironic.drivers import base
 from ironic_hds.modules import common
+from ironic_hds.modules import client as http_client
 
 LOG = logging.getLogger(__name__)
 
@@ -32,7 +33,14 @@ IRONIC_TO_REDFISH_BOOT_DEVICE = {
     boot_devices.CDROM: 'Cd',
 }
 
-# Map Ironic boot mode name to HDS equivalent
+"""
+A cache of the boot source for each system. This is because current missing
+support in the redfish manager. This will be fixed in short.
+Same for boot source, set it to disk and Ironic will change to PXE
+"""
+_SYSTEM_BOOT_SOURCE = {}
+
+# Map Ironic boot mode name to Redfish equivalent
 PERSISTENT_BOOT_MODE = 'Continuous'
 NON_PERSISTENT_BOOT_MODE = 'Once'
 
@@ -81,8 +89,18 @@ class Management(base.ManagementInterface):
             :persistent: whether the boot device will persist to all future
                 boots or not, None if it is unknown.
         """
-        client = common.get_client()
-        return client.system_get_boot_source(task.node.uuid)
+        '''
+        info = common.parse_driver_info(task.node)
+        client = http_client.HTTPClient(info['redfish_username'],
+                                        info['redfish_password'],
+                                        info.get('cert_verify', True))
+
+        system = client.get(info['redfish_address'])
+        return system['BootSource']
+        '''
+
+        boot_source = _SYSTEM_BOOT_SOURCE.get(task.node.uuid, "Disk")
+        _SYSTEM_BOOT_SOURCE.update({task.node.uuid: boot_source})
 
     @task_manager.require_exclusive_lock
     def set_boot_device(self, task, device, persistent=False):
@@ -100,10 +118,21 @@ class Management(base.ManagementInterface):
         """
         LOG.info("set_boot_device node:%s device:'%s' persistent:%s" %
                  (task.node.uuid, device, persistent))
-        client = common.get_client()
-        client.system_set_boot_source(task.node.uuid,
-                                      IRONIC_TO_REDFISH_BOOT_DEVICE[device],
-                                      "Continuous" if persistent else "Once")
+        info = task.node.driver_info
+        client = http_client.HTTPClient(info['redfish_username'],
+                                        info['redfish_password'],
+                                        info.get('cert_verify', True))
+        target = IRONIC_TO_REDFISH_BOOT_DEVICE[device]
+        enabled = "Continuous" if persistent else "Once"
+        data = {
+            "Boot": {
+                "BootSourceOverrideTarget": target,
+                "BootSourceOverrideEnabled": enabled
+            }
+        }
+        client.patch(info['redfish_address'], data)
+
+        _SYSTEM_BOOT_SOURCE.update({task.node.uuid: target})
 
     def get_sensors_data(self, task):
         """Get sensors data.

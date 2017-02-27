@@ -22,6 +22,7 @@ from ironic.common import states
 from ironic.conductor import task_manager
 from ironic.drivers import base
 from ironic_hds.modules import common
+from ironic_hds.modules import client as http_client
 
 LOG = logging.getLogger(__name__)
 
@@ -32,6 +33,21 @@ REDFISH_TO_IRONIC_POWER_STATES = {
     'PoweringOff': states.POWER_ON,
 }
 
+"""
+A cache of the power state for each system. This is because current missing
+support in the redfish manager. This will be fixed in short.
+Assume systems are powered ON when we start (should be safer) since the
+Ironic e.g. will start by powering them on and we get to a known state.
+
+Same for boot source, set it to disk and Ironic will change to PXE
+"""
+_SYSTEM_POWER = {}
+
+RESET_TYPE_TO_POWER_STATE = {
+    'On': 'On',
+    'ForceOff': 'Off',
+    'ForceRestart': 'On'
+}
 
 class Power(base.PowerInterface):
     """Interface for power-related actions."""
@@ -61,12 +77,16 @@ class Power(base.PowerInterface):
         :raises: InvalidParameterValue if required credentials are missing.
         :raises: RedfishOperationError on an error from redfish.
         """
-
+        '''
         node = task.node
-        client = common.get_client()
+        info = common.parse_driver_info(task.node)
+        client = client.HTTPClient(info['redfish_username'],
+                                   info['redfish_password'],
+                                   info.get('cert_verify', True))
 
         try:
-            power_state = client.system_get_power_state(node.uuid)
+            system = client.get(info['redfish_address'])
+            power_state = system['PowerState']
         except Exception as exc:
             LOG.error(_LE('HDS driver failed to get node '
                           '%(node_uuid)s power state. '
@@ -75,6 +95,11 @@ class Power(base.PowerInterface):
             raise
 
         return REDFISH_TO_IRONIC_POWER_STATES[power_state]
+        '''
+
+        power_state = _SYSTEM_POWER.get(task.node.uuid, "On")
+        _SYSTEM_POWER.update({task.node.uuid: power_state})
+        return power_state
 
     @task_manager.require_exclusive_lock
     def set_power_state(self, task, power_state):
@@ -85,10 +110,14 @@ class Power(base.PowerInterface):
         :raises: RedfishOperationError on an error from redfish.
         """
 
-        LOG.info("set_power_state node:%s, state:'%s'" % (task.node.uuid, power_state))
+        LOG.debug("set_power_state node:%s, state:'%s'" % (task.node.uuid, power_state))
 
         node = task.node
-        client = common.get_client()
+        info = node.driver_info
+        client = http_client.HTTPClient(info['redfish_username'],
+                                        info['redfish_password'],
+                                        info.get('cert_verify', True))
+
         if power_state == states.POWER_ON:
             # "ForceRestart" seems to work better then "On"
             reset_type = 'ForceRestart'
@@ -99,8 +128,11 @@ class Power(base.PowerInterface):
         else:
             raise ValueError("Unsupported power_state '%s'" % power_state)
 
+
+        url = info['redfish_address'] + "/Actions/ComputerSystem.Reset"
+
         try:
-            client.system_reset(node.uuid, reset_type)
+            client.post(url, {"ResetType": reset_type})
         except Exception as exc:
             LOG.error(_LE('HDS driver failed to reset node '
                           '%(node_uuid)s to %(power_state)s. '
@@ -109,6 +141,8 @@ class Power(base.PowerInterface):
                        'power_state': power_state,
                        'error': exc})
             raise
+
+        _SYSTEM_POWER.update({task.node.uuid: RESET_TYPE_TO_POWER_STATE[reset_type]})
 
     @task_manager.require_exclusive_lock
     def reboot(self, task):

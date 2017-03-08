@@ -82,10 +82,10 @@ class Power(base.PowerInterface):
         info = common.parse_driver_info(task.node)
         client = client.HTTPClient(info['redfish_username'],
                                    info['redfish_password'],
-                                   info.get('cert_verify', True))
+                                   info.get('redfish_verify_ca', True))
 
         try:
-            system = client.get(info['redfish_address'])
+            system = client.get(info['redfish_uri'])
             power_state = system['PowerState']
         except Exception as exc:
             LOG.error(_LE('HDS driver failed to get node '
@@ -116,7 +116,7 @@ class Power(base.PowerInterface):
         info = node.driver_info
         client = http_client.HTTPClient(info['redfish_username'],
                                         info['redfish_password'],
-                                        info.get('cert_verify', True))
+                                        info.get('redfish_verify_ca', True))
 
         if power_state == states.POWER_ON:
             # "ForceRestart" seems to work better then "On"
@@ -129,7 +129,7 @@ class Power(base.PowerInterface):
             raise ValueError("Unsupported power_state '%s'" % power_state)
 
 
-        url = info['redfish_address'] + "/Actions/ComputerSystem.Reset"
+        url = info['redfish_uri'] + "/Actions/ComputerSystem.Reset"
 
         try:
             client.post(url, {"ResetType": reset_type})

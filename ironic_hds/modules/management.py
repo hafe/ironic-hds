@@ -93,9 +93,9 @@ class Management(base.ManagementInterface):
         info = common.parse_driver_info(task.node)
         client = http_client.HTTPClient(info['redfish_username'],
                                         info['redfish_password'],
-                                        info.get('cert_verify', True))
+                                        info.get('redfish_verify_ca', True))
 
-        system = client.get(info['redfish_address'])
+        system = client.get(info['redfish_uri'])
         return system['BootSource']
         '''
 
@@ -121,7 +121,7 @@ class Management(base.ManagementInterface):
         info = task.node.driver_info
         client = http_client.HTTPClient(info['redfish_username'],
                                         info['redfish_password'],
-                                        info.get('cert_verify', True))
+                                        info.get('redfish_verify_ca', True))
         target = IRONIC_TO_REDFISH_BOOT_DEVICE[device]
         enabled = "Continuous" if persistent else "Once"
         data = {
@@ -130,7 +130,7 @@ class Management(base.ManagementInterface):
                 "BootSourceOverrideEnabled": enabled
             }
         }
-        client.patch(info['redfish_address'], data)
+        client.patch(info['redfish_uri'], data)
 
         _SYSTEM_BOOT_SOURCE.update({task.node.uuid: target})
 

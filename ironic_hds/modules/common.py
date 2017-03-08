@@ -24,27 +24,14 @@ COMMON_PROPERTIES = {}
 
 LOG = logging.getLogger(__name__)
 
-opts = [
-    cfg.StrOpt('root_url',
-               help=_('URL where Redfish manager is available.')),
-    cfg.StrOpt('username',
-               help=_('Redfish username to be used.')),
-    cfg.StrOpt('password',
-               secret=True,
-               help=_('Redfish password to be used.')),
-    cfg.BoolOpt('cert_verify',
-                default=False,
-                help=_('Option to skip Redfish certificate verification')),
-]
-
 REQUIRED_PROPERTIES = {
-    'redfish_address': _('Redfish Manager hostname/IP-address. Required.'),
+    'redfish_uri': _('Redfish System URI. Required.'),
     'redfish_username': _('Redfish Manager admin/server-profile username. Required.'),
     'redfish_password': _('Redfish Manager password. Required.'),
 }
 
 OPTIONAL_PROPERTIES = {
-    'cert_verify': _("Skip server certificate validation. Optional."),
+    'redfish_verify_ca': _("True/False/Cert. Optional."),
 }
 
 COMMON_PROPERTIES = {}

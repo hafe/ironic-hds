@@ -9,16 +9,21 @@ System.
 Build
 =====
 
-Create a package (egg, rpm, ...) for example::
+Create an RPM package suitable for RHEL/CentOS based systems::
 
-    $ python setup.py bdist_egg
+    $ python setup.py sdist
+    $ tar xvfz dist/ironic-hds-<VERSION>.tar.gz --directory /tmp
+    $ cd /tmp/ironic-hds-<VERSION>
+    $ python setup.py bdist_rpm
+
+RPM should be found in the *dist* directory.
 
 Installation
 ============
 
-Install the package for example::
+Install the package in the undercloud::
 
-    $ sudo easy_install ironic_hds-0.0.1.dev7-py2.7.egg
+    $ sudo yum install ironic-hds-<VERSION>.noarch.rpm
 
 Configuration
 =============
@@ -26,23 +31,19 @@ Configuration
 Common
 ++++++
 
-Add *agent_hds* and/or *pxe_hds* to the list of *enabled_drivers* in
-*/etc/ironic/ironic.conf* for example::
-
-    enabled_drivers = pxe_ipmitool,pxe_hds,agent_hds
+Add *pxe_hds* to the list of *enabled_drivers* in */etc/ironic/ironic.conf*
 
 Restart the Ironic conductor service::
 
-    service ironic-conductor restart
-
+    sudo systemctl restart openstack-ironic-conductor
 
 Node specific
 +++++++++++++
 
 Enroll some nodes managed by this driver::
 
-    $ ironic node-create -d agent_hds -n hds-1 -u 4c4c4544-0053-5610-8053-b2c04f563432 \
-        -i redfish_address=https://192.168.122.1:8080/redfish/v1/4c4c4544-0053-5610-8053-b2c04f563432 \
+    $ ironic node-create -d agent_hds -n hds-1 -u <uuid> \
+        -i redfish_address=https://192.168.122.1/redfish/v1/<uuid> \
         -i redfish_username=admin \
         -i redfish_password=qwerty
 
@@ -53,7 +54,7 @@ Optionally allow insecure TLS connections, configure to skip certificate verific
 
 Associate port with node created::
 
-    $ ironic port-create -n 4c4c4544-0053-5610-8053-b2c04f563432 -a ec:f4:bb:e0:d5:dc
+    $ ironic port-create -n <uuid> -a ec:f4:bb:e0:d5:dc
 
 In the example the Redfish ComputerSystem ID is used as Ironic's node uuid.
 This is not required but enables simple correlation of Ironic nodes and Redfish

@@ -84,8 +84,10 @@ class Power(base.PowerInterface):
                                    info['redfish_password'],
                                    info.get('redfish_verify_ca', True))
 
+        url = info['redfish_address'] + info['redfish_system_id']
+
         try:
-            system = client.get(info['redfish_uri'])
+            system = client.get(url)
             power_state = system['PowerState']
         except Exception as exc:
             LOG.error(_LE('HDS driver failed to get node '
@@ -129,7 +131,9 @@ class Power(base.PowerInterface):
             raise ValueError("Unsupported power_state '%s'" % power_state)
 
 
-        url = info['redfish_uri'] + "/Actions/ComputerSystem.Reset"
+        url = info['redfish_address'] + \
+              info['redfish_system_id'] + \
+              "/Actions/ComputerSystem.Reset"
 
         try:
             client.post(url, {"ResetType": reset_type})

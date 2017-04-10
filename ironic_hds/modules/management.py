@@ -130,7 +130,10 @@ class Management(base.ManagementInterface):
                 "BootSourceOverrideEnabled": enabled
             }
         }
-        client.patch(info['redfish_uri'], data)
+
+        url = info['redfish_address'] + info['redfish_system_id']
+
+        client.patch(url, data)
 
         _SYSTEM_BOOT_SOURCE.update({task.node.uuid: target})
 

@@ -15,6 +15,8 @@
 Common functionality shared between different modules.
 """
 
+import os
+
 from oslo_config import cfg
 from oslo_log import log as logging
 from ironic.common.i18n import _
@@ -25,17 +27,38 @@ COMMON_PROPERTIES = {}
 LOG = logging.getLogger(__name__)
 
 REQUIRED_PROPERTIES = {
-    'redfish_uri': _('Redfish System URI. Required.'),
-    'redfish_username': _('Redfish Manager admin/server-profile username. Required.'),
-    'redfish_password': _('Redfish Manager password. Required.'),
+    'redfish_address': _('The URL address to the Redfish controller. It '
+                         'should include scheme and authority portion of '
+                         'the URL. For example: https://mgmt.vendor.com. '
+                         'Required'),
+    'redfish_system_id': _('The canonical path to the ComputerSystem '
+                           'resource that the driver will interact with. '
+                           'It should include the root service, version and '
+                           'the unique resource path to a ComputerSystem '
+                           'within the same authority as the redfish_address '
+                           'property. For example: /redfish/v1/Systems/1. '
+                           'Required')
 }
 
 OPTIONAL_PROPERTIES = {
-    'redfish_verify_ca': _("True/False/Cert. Optional."),
+    'redfish_username': _('User account with admin/server-profile access '
+                          'privilege. Although this property is not '
+                          'mandatory it\'s highly recommended to set a '
+                          'username. Optional'),
+    'redfish_password': _('User account password. Although this property is '
+                          'not mandatory, it\'s highly recommended to set a '
+                          'password. Optional'),
+    'redfish_verify_ca': _('Either a boolean value, a path to a CA_BUNDLE '
+                           'file or directory with certificates of trusted '
+                           'CAs. If set to True the driver will verify the '
+                           'host certificates; if False the driver will '
+                           'ignore verifying the SSL certificate; if it\'s '
+                           'a path the driver will use the specified '
+                           'certificate or one of the certificates in the '
+                           'directory. Defaults to True. Optional')
 }
 
-COMMON_PROPERTIES = {}
-COMMON_PROPERTIES.update(REQUIRED_PROPERTIES)
+COMMON_PROPERTIES = REQUIRED_PROPERTIES.copy()
 COMMON_PROPERTIES.update(OPTIONAL_PROPERTIES)
 
 
@@ -52,11 +75,23 @@ def parse_driver_info(node):
              is missing on the node or on invalid inputs.
     """
 
-    info = {}
+    driver_info = node.driver_info or {}
     for param in REQUIRED_PROPERTIES:
-        info[param] = node.driver_info.get(param)
+        driver_info[param] = node.driver_info.get(param)
     error_msg = (_("%s driver requires these parameters to be set in the "
                    "node's driver_info.") %
                  node.driver)
-    deploy_utils.check_for_missing_params(info, error_msg)
-    return info
+    deploy_utils.check_for_missing_params(driver_info, error_msg)
+
+    # Check if verify_ca is a boolean or a file/directory in the file-system
+    verify_ca = driver_info.get('redfish_verify_ca', True)
+    if not isinstance(verify_ca, bool):
+        if not os.path.exists(verify_ca):
+            raise ValueError(
+                _('Invalid value "%(value)s given to '
+                  'driver_info/redfish_verify_ca on node %(node)s. '
+                  'The value should be either a boolean, a path to a '
+                  'CA_BUNDLE file or directory with certificates of '
+                  'trusted CAs') % {'value': verify_ca, 'node': node.uuid})
+
+    return driver_info

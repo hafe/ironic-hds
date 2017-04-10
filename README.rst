@@ -43,18 +43,22 @@ Node specific
 Enroll some nodes managed by this driver::
 
     $ ironic node-create -d agent_hds -n hds-1 -u <uuid> \
-        -i redfish_address=https://192.168.122.1/redfish/v1/<uuid> \
+        -i redfish_address=https://192.168.122.1 \
+        -i redfish_system_id=/redfish/v1/<uuid> \
         -i redfish_username=admin \
         -i redfish_password=qwerty
 
-Optionally allow insecure TLS connections, configure to skip certificate verification::
+Optionally configure a local CA bundle::
 
-        -i cert_verify=false
+        -i redfish_verify_ca=/etc/ssl/certs/ca-bundle.crt
 
+Or completely skip certificate verification::
+
+        -i redfish_verify_ca=false
 
 Associate port with node created::
 
-    $ ironic port-create -n <uuid> -a ec:f4:bb:e0:d5:dc
+    $ ironic port-create -n <uuid> -a <MAC address>
 
 In the example the Redfish ComputerSystem ID is used as Ironic's node uuid.
 This is not required but enables simple correlation of Ironic nodes and Redfish

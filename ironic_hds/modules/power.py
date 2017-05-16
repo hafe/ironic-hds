@@ -107,8 +107,7 @@ class Power(base.PowerInterface):
                                         info.get('redfish_verify_ca', True))
 
         if power_state == states.POWER_ON:
-            # "ForceRestart" seems to work better then "On"
-            reset_type = 'ForceRestart'
+            reset_type = 'On'
         elif power_state == states.POWER_OFF:
             reset_type = 'ForceOff'
         elif power_state == states.REBOOT:
